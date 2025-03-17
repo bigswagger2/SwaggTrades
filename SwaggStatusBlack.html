@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Trading - SwaggTrades</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000; /* Fondo negro */
+            color: #ffffff; /* Texto blanco */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #000000; /* Fondo negro */
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 168, 255, 0.3); /* Sombra azul eléctrico */
+            border: 1px solid rgba(0, 168, 255, 0.2); /* Borde azul eléctrico sutil */
+        }
+
+        h2 {
+            font-size: 22px; /* Tamaño de fuente equilibrado */
+            margin-bottom: 15px;
+            color: #00a8ff; /* Azul eléctrico */
+            text-align: center;
+        }
+
+        p {
+            font-size: 14px; /* Tamaño de fuente equilibrado */
+            color: #dddddd; /* Texto gris claro */
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            background: #1a1a1a; /* Fondo gris oscuro */
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .question:hover {
+            background: #333333; /* Fondo gris más claro al hacer hover */
+        }
+
+        .question label {
+            display: flex;
+            align-items: center;
+            font-size: 14px; /* Tamaño de fuente equilibrado */
+            color: #ffffff; /* Texto blanco */
+            cursor: pointer;
+        }
+
+        .question input {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background: #1a1a1a; /* Fondo gris oscuro */
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress {
+            height: 8px; /* Altura equilibrada */
+            width: 0%;
+            background: #00a8ff; /* Azul eléctrico */
+            transition: width 0.3s ease;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px; /* Tamaño de fuente equilibrado */
+            color: #ffffff; /* Texto blanco */
+            background: #00a8ff; /* Azul eléctrico */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #0097e6; /* Azul eléctrico más oscuro al hacer hover */
+        }
+
+        #resultado {
+            font-size: 18px; /* Tamaño de fuente equilibrado */
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            color: #ffffff; /* Texto blanco */
+        }
+
+        #consejo {
+            font-size: 14px; /* Tamaño de fuente equilibrado */
+            color: #dddddd; /* Texto gris claro */
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+            border-radius: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px; /* Tamaño de fuente equilibrado */
+            color: #dddddd; /* Texto gris claro */
+            margin-top: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Estilos para móviles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                max-width: 90%; /* Reducir el ancho máximo en móviles */
+            }
+
+            h2 {
+                font-size: 20px; /* Tamaño de fuente equilibrado */
+            }
+
+            p {
+                font-size: 13px; /* Tamaño de fuente equilibrado */
+            }
+
+            .question label {
+                font-size: 13px; /* Tamaño de fuente equilibrado */
+            }
+
+            button {
+                font-size: 14px; /* Tamaño de fuente equilibrado */
+                padding: 10px;
+            }
+
+            #resultado {
+                font-size: 16px; /* Tamaño de fuente equilibrado */
+            }
+
+            #consejo {
+                font-size: 13px; /* Tamaño de fuente equilibrado */
+            }
+
+            .footer {
+                font-size: 11px; /* Tamaño de fuente equilibrado */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <h2>¿Estás listo para operar?</h2>
+        <p>Responde estas preguntas para evaluar tu estado antes de operar.</p>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <form id="tradingForm">
+            <div class="question"><label><input type="checkbox" name="question" value="2" onchange="updateProgress()"> 🛏️ Dormí al menos 7 horas.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="1" onchange="updateProgress()"> 😌 Me siento relajado y sin estrés.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="1" onchange="updateProgress()"> 🥗 He comido bien y estoy hidratado.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="2" onchange="updateProgress()"> 🚫 No tengo distracciones externas.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="3" onchange="updateProgress()"> 📋 He revisado mi plan de trading.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="3" onchange="updateProgress()"> 🎯 Acepto que puedo perder sin afectar mi emoción.</label></div>
+            <button type="button" onclick="evaluarCondicion()">Evaluar</button>
+        </form>
+        <h3 id="resultado"></h3>
+        <div id="consejo" class="hidden"></div>
+        <div class="footer">Desarrollado por GJ Valdez - SwaggTrades</div>
+    </div>
+
+    <script>
+        function updateProgress() {
+            let checkboxes = document.querySelectorAll('input[name="question"]');
+            let totalScore = 0;
+            let maxScore = 0;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) totalScore += parseInt(checkbox.value);
+                maxScore += parseInt(checkbox.value);
+            });
+            let progress = document.getElementById("progress");
+            progress.style.width = (totalScore / maxScore) * 100 + "%";
+        }
+        
+        function evaluarCondicion() {
+            let checkboxes = document.querySelectorAll('input[name="question"]');
+            let totalScore = 0;
+            let maxScore = 0;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) totalScore += parseInt(checkbox.value);
+                maxScore += parseInt(checkbox.value);
+            });
+
+            let resultado = document.getElementById("resultado");
+            let consejo = document.getElementById("consejo");
+            consejo.classList.remove("hidden");
+
+            if (totalScore >= maxScore * 0.8) {
+                resultado.innerHTML = "✅ Estás en óptimas condiciones para operar.";
+                resultado.style.color = "#4caf50"; /* Verde */
+                consejo.innerHTML = "Consejo: Mantén tu enfoque y sigue tu plan de trading al pie de la letra. ¡Estás listo para tomar decisiones inteligentes!";
+            } else if (totalScore >= maxScore * 0.5) {
+                resultado.innerHTML = "⚠️ Estás en condiciones moderadas para operar.";
+                resultado.style.color = "#ff9800"; /* Naranja */
+                consejo.innerHTML = "Consejo: Tómate un momento para revisar tu plan de trading y asegúrate de estar relajado. Considera hacer ejercicios de respiración antes de operar.";
+            } else {
+                resultado.innerHTML = "❌ No estás en condiciones óptimas para operar hoy.";
+                resultado.style.color = "#f44336"; /* Rojo */
+                consejo.innerHTML = "Consejo: Descansa, hidrátate y revisa tu plan de trading. Evita operar bajo estrés o fatiga. ¡Tu bienestar es clave para el éxito!";
+            }
+        }
+    </script>
+</body>
+</html>
