@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Trading - SwaggTrades</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 400px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        p { color: #666; }
+        .question { text-align: left; margin: 10px 0; }
+        button { margin-top: 20px; padding: 12px; font-size: 16px; cursor: pointer; border: none; border-radius: 5px; background: #007BFF; color: white; width: 100%; }
+        button:hover { background: #0056b3; }
+        .progress-bar { width: 100%; background: #ddd; border-radius: 5px; overflow: hidden; margin-bottom: 15px; }
+        .progress { height: 10px; width: 0%; background: #007BFF; transition: width 0.3s; }
+        #resultado { font-size: 18px; font-weight: bold; margin-top: 20px; }
+        .footer { margin-top: 20px; font-size: 14px; color: #555; }
+        .recommendation { margin-top: 10px; font-size: 14px; color: #555; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>¿Estás listo para operar?</h2>
+        <p>Responde estas preguntas para evaluar tu estado antes de operar.</p>
+        <div class="progress-bar"><div class="progress" id="progress"></div></div>
+        <form id="tradingForm">
+            <div class="question"><label><input type="checkbox" name="question" value="2" onchange="updateProgress()"> 🛏️ Dormí al menos 7 horas.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="1" onchange="updateProgress()"> 😌 Me siento relajado y sin estrés.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="1" onchange="updateProgress()"> 🥗 He comido bien y estoy hidratado.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="2" onchange="updateProgress()"> 🚫 No tengo distracciones externas.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="3" onchange="updateProgress()"> 📋 He revisado mi plan de trading.</label></div>
+            <div class="question"><label><input type="checkbox" name="question" value="3" onchange="updateProgress()"> 🎯 Acepto que puedo perder sin afectar mi emoción.</label></div>
+            <button type="button" onclick="evaluarCondicion()">Evaluar</button>
+        </form>
+        <h3 id="resultado"></h3>
+        <div id="recommendation" class="recommendation hidden"></div>
+        <div id="insights" class="recommendation hidden"></div>
+        <div class="footer">Desarrollado por GJ Valdez - SwaggTrades</div>
+    </div>
+
+    <script>
+        function updateProgress() {
+            let checkboxes = document.querySelectorAll('input[name="question"]');
+            let totalScore = 0;
+            let maxScore = 0;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) totalScore += parseInt(checkbox.value);
+                maxScore += parseInt(checkbox.value);
+            });
+            let progress = document.getElementById("progress");
+            progress.style.width = (totalScore / maxScore) * 100 + "%";
+        }
+        
+        function evaluarCondicion() {
+            let checkboxes = document.querySelectorAll('input[name="question"]');
+            let totalScore = 0;
+            let maxScore = 0;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) totalScore += parseInt(checkbox.value);
+                maxScore += parseInt(checkbox.value);
+            });
+
+            let resultado = document.getElementById("resultado");
+            let recommendation = document.getElementById("recommendation");
+            let insights = document.getElementById("insights");
+            recommendation.classList.remove("hidden");
+            insights.classList.remove("hidden");
+
+            if (totalScore >= maxScore * 0.8) {
+                resultado.innerHTML = "✅ Estás en óptimas condiciones para operar.";
+                resultado.style.color = "green";
+                recommendation.innerHTML = "¡Excelente! Estás listo para operar con confianza.";
+                insights.innerHTML = "Recomendación: Mantén tu enfoque y sigue tu plan de trading al pie de la letra.";
+            } else if (totalScore >= maxScore * 0.5) {
+                resultado.innerHTML = "⚠️ Estás en condiciones moderadas para operar.";
+                resultado.style.color = "orange";
+                recommendation.innerHTML = "Considera revisar tu plan de trading y asegúrate de estar relajado antes de operar.";
+                insights.innerHTML = "Recomendación: Tómate un momento para meditar o hacer ejercicios de respiración.";
+            } else {
+                resultado.innerHTML = "❌ No estás en condiciones óptimas para operar hoy.";
+                resultado.style.color = "red";
+                recommendation.innerHTML = "Te recomendamos descansar, revisar tu plan y evitar operar bajo estrés.";
+                insights.innerHTML = "Recomendación: Descansa, hidrátate y vuelve a evaluar tu estado más tarde.";
+            }
+        }
+    </script>
+</body>
+</html>
