@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Lotes - SwaggTrades</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .container {
+            background: #000000;
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 168, 255, 0.3);
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pantalla {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pantalla.activa {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #00a8ff;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #dddddd;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            background: #1a1a1a;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            color: #ffffff;
+            background: #00a8ff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #0097e6;
+        }
+
+        #resultado {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            color: #ffffff;
+        }
+
+        #ganancia-perdida {
+            font-size: 14px;
+            color: #dddddd;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #dddddd;
+            margin-top: 15px;
+        }
+
+        .footer a {
+            color: #00a8ff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #0097e6;
+        }
+
+        /* Selector de temas */
+        .selector-tema {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .selector-tema label {
+            display: none; /* Ocultar el label */
+        }
+
+        .selector-tema select {
+            width: auto;
+            padding: 5px;
+            font-size: 12px; /* Tamaño de fuente más pequeño */
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            appearance: none; /* Eliminar el estilo por defecto del select */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 5px center;
+            background-size: 12px;
+        }
+
+        .selector-tema select:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Temas de colores */
+        .tema-clasico {
+            --color-fondo: #000000;
+            --color-texto: #ffffff;
+            --color-botones: #00a8ff;
+            --color-botones-hover: #0097e6;
+            --color-bordes: rgba(0, 168, 255, 0.2);
+        }
+
+        .tema-oscuro-elegante {
+            --color-fondo: #1e1e1e;
+            --color-texto: #ffffff;
+            --color-botones: #ffd700;
+            --color-botones-hover: #e6b800;
+            --color-bordes: rgba(255, 215, 0, 0.2);
+        }
+
+        .tema-minimalista {
+            --color-fondo: #ffffff;
+            --color-texto: #333333;
+            --color-botones: #666666;
+            --color-botones-hover: #555555;
+            --color-bordes: rgba(102, 102, 102, 0.2);
+        }
+
+        .tema-vibrante {
+            --color-fondo: #4b0082;
+            --color-texto: #ffffff;
+            --color-botones: #ff4500;
+            --color-botones-hover: #e63e00;
+            --color-bordes: rgba(255, 69, 0, 0.2);
+        }
+
+        /* Aplicar el tema seleccionado */
+        body.tema-clasico {
+            background: var(--color-fondo);
+            color: var(--color-texto);
+        }
+
+        body.tema-clasico .container {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+        }
+
+        body.tema-clasico button {
+            background: var(--color-botones);
+        }
+
+        body.tema-clasico button:hover {
+            background: var(--color-botones-hover);
+        }
+
+        body.tema-clasico input,
+        body.tema-clasico select {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+            color: var(--color-texto);
+        }
+
+        /* Repetir para los otros temas */
+        body.tema-oscuro-elegante {
+            background: var(--color-fondo);
+            color: var(--color-texto);
+        }
+
+        body.tema-oscuro-elegante .container {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+        }
+
+        body.tema-oscuro-elegante button {
+            background: var(--color-botones);
+        }
+
+        body.tema-oscuro-elegante button:hover {
+            background: var(--color-botones-hover);
+        }
+
+        body.tema-oscuro-elegante input,
+        body.tema-oscuro-elegante select {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+            color: var(--color-texto);
+        }
+
+        body.tema-minimalista {
+            background: var(--color-fondo);
+            color: var(--color-texto);
+        }
+
+        body.tema-minimalista .container {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+        }
+
+        body.tema-minimalista button {
+            background: var(--color-botones);
+        }
+
+        body.tema-minimalista button:hover {
+            background: var(--color-botones-hover);
+        }
+
+        body.tema-minimalista input,
+        body.tema-minimalista select {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+            color: var(--color-texto);
+        }
+
+        body.tema-vibrante {
+            background: var(--color-fondo);
+            color: var(--color-texto);
+        }
+
+        body.tema-vibrante .container {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+        }
+
+        body.tema-vibrante button {
+            background: var(--color-botones);
+        }
+
+        body.tema-vibrante button:hover {
+            background: var(--color-botones-hover);
+        }
+
+        body.tema-vibrante input,
+        body.tema-vibrante select {
+            background: var(--color-fondo);
+            border-color: var(--color-bordes);
+            color: var(--color-texto);
+        }
+    </style>
+</head>
+<body class="tema-clasico">
+    <div class="container">
+        <!-- Selector de temas -->
+        <div class="selector-tema">
+            <select id="tema" onchange="cambiarTema()">
+                <option value="tema-clasico">Clásico</option>
+                <option value="tema-oscuro-elegante">Oscuro Elegante</option>
+                <option value="tema-minimalista">Minimalista</option>
+                <option value="tema-vibrante">Vibrante</option>
+            </select>
+        </div>
+
+        <!-- Pantalla 1: Selección del mercado -->
+        <div class="pantalla activa" id="pantalla1">
+            <h2>¿Qué mercado quieres operar?</h2>
+            <select id="mercado" name="mercado" onchange="actualizarActivos()">
+                <option value="forex">Forex</option>
+                <option value="indices">Índices</option>
+                <option value="commodities">Commodities</option>
+                <option value="criptos">Criptomonedas</option>
+            </select>
+            <button type="button" onclick="siguientePantalla('pantalla2')">Siguiente</button>
+        </div>
+
+        <!-- Pantalla 2: Selección del activo -->
+        <div class="pantalla" id="pantalla2">
+            <h2>¿Qué activo quieres operar?</h2>
+            <select id="activo" name="activo">
+                <!-- Opciones de Forex -->
+                <option value="EURUSD" data-pip="10" data-lote="100000">EURUSD (Euro/Dólar)</option>
+                <option value="GBPUSD" data-pip="10" data-lote="100000">GBPUSD (Libra/Dólar)</option>
+                <option value="USDJPY" data-pip="10" data-lote="100000">USDJPY (Dólar/Yen)</option>
+                <option value="USDCAD" data-pip="10" data-lote="100000">USDCAD (Dólar/Dólar Canadiense)</option>
+                <option value="AUDUSD" data-pip="10" data-lote="100000">AUDUSD (Dólar Australiano/Dólar)</option>
+                <option value="NZDUSD" data-pip="10" data-lote="100000">NZDUSD (Dólar Neozelandés/Dólar)</option>
+                <option value="USDCHF" data-pip="10" data-lote="100000">USDCHF (Dólar/Franco Suizo)</option>
+                <option value="EURGBP" data-pip="10" data-lote="100000">EURGBP (Euro/Libra)</option>
+                <option value="EURJPY" data-pip="10" data-lote="100000">EURJPY (Euro/Yen)</option>
+                <option value="GBPJPY" data-pip="10" data-lote="100000">GBPJPY (Libra/Yen)</option>
+                <option value="AUDJPY" data-pip="10" data-lote="100000">AUDJPY (Dólar Australiano/Yen)</option>
+                <option value="CADJPY" data-pip="10" data-lote="100000">CADJPY (Dólar Canadiense/Yen)</option>
+                <option value="AUDNZD" data-pip="10" data-lote="100000">AUDNZD (Dólar Australiano/Dólar Neozelandés)</option>
+                <option value="NZDJPY" data-pip="10" data-lote="100000">NZDJPY (Dólar Neozelandés/Yen)</option>
+                <option value="EURAUD" data-pip="10" data-lote="100000">EURAUD (Euro/Dólar Australiano)</option>
+                <option value="EURCAD" data-pip="10" data-lote="100000">EURCAD (Euro/Dólar Canadiense)</option>
+                <option value="GBPAUD" data-pip="10" data-lote="100000">GBPAUD (Libra/Dólar Australiano)</option>
+                <option value="GBPNZD" data-pip="10" data-lote="100000">GBPNZD (Libra/Dólar Neozelandés)</option>
+                <option value="CHFJPY" data-pip="10" data-lote="100000">CHFJPY (Franco Suizo/Yen)</option>
+                <option value="EURCHF" data-pip="10" data-lote="100000">EURCHF (Euro/Franco Suizo)</option>
+                <option value="NZDCHF" data-pip="10" data-lote="100000">NZDCHF (Dólar Neozelandés/Franco Suizo)</option>
+                <option value="AUDCHF" data-pip="10" data-lote="100000">AUDCHF (Dólar Australiano/Franco Suizo)</option>
+            </select>
+            <button type="button" onclick="siguientePantalla('pantalla3')">Siguiente</button>
+        </div>
+
+        <!-- Pantalla 3: Riesgo -->
+        <div class="pantalla" id="pantalla3">
+            <h2>¿Cuánto quieres arriesgar? (en USD)</h2>
+            <input type="number" id="riesgo" name="riesgo" placeholder="Ej: 100" required>
+            <button type="button" onclick="siguientePantalla('pantalla4')">Siguiente</button>
+        </div>
+
+        <!-- Pantalla 4: Stop Loss -->
+        <div class="pantalla" id="pantalla4">
+            <h2>¿Cuántos pips serán tu Stop Loss?</h2>
+            <input type="number" id="stopLoss" name="stopLoss" placeholder="Ej: 10" required>
+            <button type="button" onclick="siguientePantalla('pantalla5')">Siguiente</button>
+        </div>
+
+        <!-- Pantalla 5: Take Profit -->
+        <div class="pantalla" id="pantalla5">
+            <h2>¿Cuántos pips de beneficio quieres?</h2>
+            <input type="number" id="takeProfit" name="takeProfit" placeholder="Ej: 20" required>
+            <button type="button" onclick="calcularLotes()">Calcular</button>
+        </div>
+
+        <!-- Pantalla 6: Resultado -->
+        <div class="pantalla" id="pantalla6">
+            <h2>Resultado</h2>
+            <h3 id="resultado"></h3>
+            <div id="ganancia-perdida"></div>
+            <button type="button" onclick="reiniciar()">Volver al Inicio</button>
+        </div>
+
+        <div class="footer">
+            Desarrollado por GJ Valdez - SwaggTrades<br>
+            <a href="https://www.paypal.com/donate/?business=3H4XYQX349QVJ&no_recurring=0&item_name=Te+agradezco+mucho+y+que+Dios+te+bendiga+abundantemente&currency_code=EUR" target="_blank">❤️ Donar con PayPal</a>
+        </div>
+    </div>
+
+    <script>
+        // Función para cambiar de pantalla
+        function siguientePantalla(siguiente) {
+            const pantallaActual = document.querySelector(".pantalla.activa");
+            pantallaActual.classList.remove("activa");
+            document.getElementById(siguiente).classList.add("activa");
+        }
+
+        // Función para actualizar los activos según el mercado seleccionado
+        function actualizarActivos() {
+            const mercado = document.getElementById("mercado").value;
+            const activoSelect = document.getElementById("activo");
+
+            // Limpiar opciones actuales
+            activoSelect.innerHTML = "";
+
+            // Agregar opciones según el mercado
+            if (mercado === "forex") {
+                activoSelect.innerHTML = `
+                    <option value="EURUSD" data-pip="10" data-lote="100000">EURUSD (Euro/Dólar)</option>
+                    <option value="GBPUSD" data-pip="10" data-lote="100000">GBPUSD (Libra/Dólar)</option>
+                    <option value="USDJPY" data-pip="10" data-lote="100000">USDJPY (Dólar/Yen)</option>
+                    <option value="USDCAD" data-pip="10" data-lote="100000">USDCAD (Dólar/Dólar Canadiense)</option>
+                    <option value="AUDUSD" data-pip="10" data-lote="100000">AUDUSD (Dólar Australiano/Dólar)</option>
+                    <option value="NZDUSD" data-pip="10" data-lote="100000">NZDUSD (Dólar Neozelandés/Dólar)</option>
+                    <option value="USDCHF" data-pip="10" data-lote="100000">USDCHF (Dólar/Franco Suizo)</option>
+                    <option value="EURGBP" data-pip="10" data-lote="100000">EURGBP (Euro/Libra)</option>
+                    <option value="EURJPY" data-pip="10" data-lote="100000">EURJPY (Euro/Yen)</option>
+                    <option value="GBPJPY" data-pip="10" data-lote="100000">GBPJPY (Libra/Yen)</option>
+                    <option value="AUDJPY" data-pip="10" data-lote="100000">AUDJPY (Dólar Australiano/Yen)</option>
+                    <option value="CADJPY" data-pip="10" data-lote="100000">CADJPY (Dólar Canadiense/Yen)</option>
+                    <option value="AUDNZD" data-pip="10" data-lote="100000">AUDNZD (Dólar Australiano/Dólar Neozelandés)</option>
+                    <option value="NZDJPY" data-pip="10" data-lote="100000">NZDJPY (Dólar Neozelandés/Yen)</option>
+                    <option value="EURAUD" data-pip="10" data-lote="100000">EURAUD (Euro/Dólar Australiano)</option>
+                    <option value="EURCAD" data-pip="10" data-lote="100000">EURCAD (Euro/Dólar Canadiense)</option>
+                    <option value="GBPAUD" data-pip="10" data-lote="100000">GBPAUD (Libra/Dólar Australiano)</option>
+                    <option value="GBPNZD" data-pip="10" data-lote="100000">GBPNZD (Libra/Dólar Neozelandés)</option>
+                    <option value="CHFJPY" data-pip="10" data-lote="100000">CHFJPY (Franco Suizo/Yen)</option>
+                    <option value="EURCHF" data-pip="10" data-lote="100000">EURCHF (Euro/Franco Suizo)</option>
+                    <option value="NZDCHF" data-pip="10" data-lote="100000">NZDCHF (Dólar Neozelandés/Franco Suizo)</option>
+                    <option value="AUDCHF" data-pip="10" data-lote="100000">AUDCHF (Dólar Australiano/Franco Suizo)</option>
+                `;
+            } else if (mercado === "indices") {
+                activoSelect.innerHTML = `
+                    <option value="SPX500" data-pip="1" data-lote="100000">S&P 500 (SPX500)</option>
+                    <option value="NAS100" data-pip="1" data-lote="100000">NASDAQ 100 (NAS100)</option>
+                    <option value="DJI30" data-pip="1" data-lote="100000">Dow Jones (DJI30)</option>
+                    <option value="GER40" data-pip="1" data-lote="100000">DAX 40 (GER40)</option>
+                    <option value="UK100" data-pip="1" data-lote="100000">FTSE 100 (UK100)</option>
+                    <option value="JPN225" data-pip="1" data-lote="100000">Nikkei 225 (JPN225)</option>
+                    <option value="AUS200" data-pip="1" data-lote="100000">ASX 200 (AUS200)</option>
+                    <option value="FRA40" data-pip="1" data-lote="100000">CAC 40 (FRA40)</option>
+                    <option value="ESP35" data-pip="1" data-lote="100000">IBEX 35 (ESP35)</option>
+                    <option value="EUSTX50" data-pip="1" data-lote="100000">Euro Stoxx 50 (EUSTX50)</option>
+                `;
+            } else if (mercado === "commodities") {
+                activoSelect.innerHTML = `
+                    <option value="XAUUSD" data-pip="1" data-lote="100">Oro (XAUUSD)</option>
+                    <option value="XAGUSD" data-pip="5" data-lote="5000">Plata (XAGUSD)</option>
+                    <option value="USOIL" data-pip="10" data-lote="1000">Petróleo WTI (USOIL)</option>
+                    <option value="UKOIL" data-pip="10" data-lote="1000">Petróleo Brent (UKOIL)</option>
+                    <option value="NATGAS" data-pip="10" data-lote="10000">Gas Natural (NATGAS)</option>
+                `;
+            } else if (mercado === "criptos") {
+                activoSelect.innerHTML = `
+                    <option value="BTCUSD" data-pip="1" data-lote="1">Bitcoin (BTCUSD)</option>
+                    <option value="ETHUSD" data-pip="0.1" data-lote="1">Ethereum (ETHUSD)</option>
+                    <option value="XRPUSD" data-pip="0.01" data-lote="1">Ripple (XRPUSD)</option>
+                    <option value="LTCUSD" data-pip="0.1" data-lote="1">Litecoin (LTCUSD)</option>
+                    <option value="BCHUSD" data-pip="1" data-lote="1">Bitcoin Cash (BCHUSD)</option>
+                    <option value="ADAUSD" data-pip="0.01" data-lote="1">Cardano (ADAUSD)</option>
+                    <option value="DOTUSD" data-pip="0.1" data-lote="1">Polkadot (DOTUSD)</option>
+                    <option value="BNBUSD" data-pip="0.1" data-lote="1">Binance Coin (BNBUSD)</option>
+                    <option value="LINKUSD" data-pip="0.1" data-lote="1">Chainlink (LINKUSD)</option>
+                    <option value="XLMUSD" data-pip="0.01" data-lote="1">Stellar (XLMUSD)</option>
+                    <option value="SOLUSD" data-pip="0.1" data-lote="1">Solana (SOLUSD)</option>
+                    <option value="DOGEUSD" data-pip="0.001" data-lote="1">Dogecoin (DOGEUSD)</option>
+                    <option value="AVAXUSD" data-pip="0.1" data-lote="1">Avalanche (AVAXUSD)</option>
+                    <option value="UNIUSD" data-pip="0.1" data-lote="1">Uniswap (UNIUSD)</option>
+                    <option value="MATICUSD" data-pip="0.01" data-lote="1">Polygon (MATICUSD)</option>
+                    <option value="LUNAUSD" data-pip="0.1" data-lote="1">Terra (LUNAUSD)</option>
+                    <option value="ALGOUSD" data-pip="0.01" data-lote="1">Algorand (ALGOUSD)</option>
+                    <option value="ATOMUSD" data-pip="0.1" data-lote="1">Cosmos (ATOMUSD)</option>
+                    <option value="XTZUSD" data-pip="0.1" data-lote="1">Tezos (XTZUSD)</option>
+                    <option value="FILUSD" data-pip="0.1" data-lote="1">Filecoin (FILUSD)</option>
+                `;
+            }
+        }
+
+        // Función para calcular los lotes
+        function calcularLotes() {
+            const riesgo = parseFloat(document.getElementById("riesgo").value);
+            const stopLoss = parseFloat(document.getElementById("stopLoss").value);
+            const takeProfit = parseFloat(document.getElementById("takeProfit").value);
+            const activo = document.getElementById("activo");
+            const valorPip = parseFloat(activo.options[activo.selectedIndex].getAttribute("data-pip"));
+            const valorLote = parseFloat(activo.options[activo.selectedIndex].getAttribute("data-lote"));
+
+            // Validar que los valores sean correctos
+            if (isNaN(riesgo) || isNaN(stopLoss) || isNaN(takeProfit) || stopLoss === 0 || takeProfit === 0) {
+                alert("Por favor, ingresa valores válidos y asegúrate de que el Stop Loss y Take Profit no sean cero.");
+                return;
+            }
+
+            // Calcular el tamaño del lote
+            const lotes = (riesgo / (stopLoss * valorPip)).toFixed(2);
+
+            // Mostrar el resultado
+            const resultado = document.getElementById("resultado");
+            resultado.innerHTML = `Debes operar con <strong>${lotes}</strong> lotes.`;
+
+            // Mostrar ganancia y pérdida
+            const gananciaPerdida = document.getElementById("ganancia-perdida");
+            gananciaPerdida.innerHTML = `
+                Si llega al Take Profit, ganarás: <strong>${(takeProfit * valorPip * lotes).toFixed(2)} USD</strong> 💰<br>
+                Si llega al Stop Loss, perderás: <strong>${(stopLoss * valorPip * lotes).toFixed(2)} USD</strong> 💔
+            `;
+
+            // Ir a la pantalla de resultados
+            siguientePantalla("pantalla6");
+        }
+
+        // Función para reiniciar la calculadora
+        function reiniciar() {
+            // Limpiar campos
+            document.getElementById("riesgo").value = "";
+            document.getElementById("stopLoss").value = "";
+            document.getElementById("takeProfit").value = "";
+            document.getElementById("resultado").innerHTML = "";
+            document.getElementById("ganancia-perdida").innerHTML = "";
+
+            // Ocultar todas las pantallas y mostrar la primera
+            const pantallas = document.querySelectorAll(".pantalla");
+            pantallas.forEach(pantalla => pantalla.classList.remove("activa"));
+            document.getElementById("pantalla1").classList.add("activa");
+        }
+
+        // Función para cambiar el tema
+        function cambiarTema() {
+            const temaSeleccionado = document.getElementById("tema").value;
+            document.body.className = temaSeleccionado;
+        }
+    </script>
+</body>
+</html>
